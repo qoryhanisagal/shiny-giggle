@@ -1,5 +1,5 @@
-require 'simplecov'
-SimpleCov.start
+# require 'simplecov'
+# SimpleCov.start
 
 # Dynamically require all files in the lib folder
 Dir["./lib/**/*.rb"].sort.each { |file| require file }
