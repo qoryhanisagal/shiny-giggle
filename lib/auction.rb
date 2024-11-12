@@ -47,4 +47,28 @@ class Auction
   def bidders
     @items.flat_map { |item| item.bids.keys.map(&:name) }.uniq
   end
+  require 'date'
+
+def date
+  Date.today.strftime("%d/%m/%Y")
+end
+
+def close_auction
+  result = {}
+
+  @items.each do |item|
+    bids = item.bids.sort_by { |_attendee, bid| -bid } # Sort bids by descending amount
+    result[item] = "Not Sold" # Default to "Not Sold"
+
+    bids.each do |attendee, bid|
+      if attendee.budget >= bid
+        result[item] = attendee # Assign the item to the highest bidder who can afford it
+        attendee.budget -= bid # Deduct the bid amount from the attendee's budget
+        break
+      end
+    end
+  end
+
+  result
+end
 end
