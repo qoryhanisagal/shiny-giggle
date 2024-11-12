@@ -69,7 +69,7 @@ class Auction
       bids = item.bids.sort_by { |_attendee, bid| -bid }
       result[item] = "Not Sold" # Default to "Not Sold"
 
-      # Attempt to sell the item to the highest bidder who can afford it
+      # Iterate through each bid to find the highest bidder who can afford it
       bids.each do |attendee, bid|
         if attendee.budget >= bid
           result[item] = attendee # Assign the item to the highest bidder
