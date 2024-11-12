@@ -63,19 +63,27 @@ class Auction
   # - Values are attendees who won the item or "Not Sold" if no one won
   def close_auction
     result = {}
+    remaining_bids = []
 
+    # Collect all bids across all items
     @items.each do |item|
-      # Sort bids by descending amount
-      bids = item.bids.sort_by { |_attendee, bid| -bid }
+      item.bids.each { |attendee, bid| remaining_bids << { attendee: attendee, item: item, bid: bid } }
       result[item] = "Not Sold" # Default to "Not Sold"
+    end
 
-      # Iterate through each bid to find the highest bidder who can afford it
-      bids.each do |attendee, bid|
-        if attendee.budget >= bid
-          result[item] = attendee # Assign the item to the highest bidder
-          attendee.budget -= bid # Deduct the bid amount from the attendee's budget
-          break # Stop iterating once the item is sold
-        end
+    # Sort all bids globally by descending bid amount
+    remaining_bids.sort_by! { |bid_hash| -bid_hash[:bid] }
+
+    # Assign items based on affordability and highest bid
+    remaining_bids.each do |bid_hash|
+      attendee = bid_hash[:attendee]
+      item = bid_hash[:item]
+      bid = bid_hash[:bid]
+
+      # Check if the item is still available and the attendee can afford it
+      if result[item] == "Not Sold" && attendee.budget >= bid
+        result[item] = attendee # Assign the item to the attendee
+        attendee.budget -= bid # Deduct the bid amount from their budget
       end
     end
 
